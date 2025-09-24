@@ -47,6 +47,14 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        medical: {
+          success: "hsl(var(--medical-success))",
+          "success-foreground": "hsl(var(--medical-success-foreground))",
+          warning: "hsl(var(--medical-warning))",
+          "warning-foreground": "hsl(var(--medical-warning-foreground))",
+          danger: "hsl(var(--medical-danger))",
+          "danger-foreground": "hsl(var(--medical-danger-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
