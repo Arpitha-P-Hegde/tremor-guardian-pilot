@@ -248,79 +248,125 @@ const Dashboard = () => {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tremor Amplitude</CardTitle>
-              <CardDescription>Real-time hand tremor measurement</CardDescription>
-            </CardHeader>
-            <CardContent className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="tremor"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Tremor Amplitude</CardTitle>
+                <CardDescription>Real-time hand tremor measurement</CardDescription>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="time" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="tremor"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            
+            {/* Tremor Features */}
+            <div className="grid grid-cols-2 gap-3">
+              <Card className="p-3">
+                <div className="text-sm font-medium text-primary">Movement Gait</div>
+                <div className="text-xs text-muted-foreground mt-1">Stride analysis & balance</div>
+              </Card>
+              <Card className="p-3">
+                <div className="text-sm font-medium text-primary">Coordination</div>
+                <div className="text-xs text-muted-foreground mt-1">Fine motor control assessment</div>
+              </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>EMG Signal</CardTitle>
-              <CardDescription>Muscle activity monitoring</CardDescription>
-            </CardHeader>
-            <CardContent className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="emg"
-                    stroke="hsl(var(--accent))"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>EMG Signal</CardTitle>
+                <CardDescription>Muscle activity monitoring</CardDescription>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="time" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="emg"
+                      stroke="hsl(var(--accent))"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            
+            {/* EMG Features */}
+            <div className="grid grid-cols-2 gap-3">
+              <Card className="p-3">
+                <div className="text-sm font-medium text-accent">Muscle Activation</div>
+                <div className="text-xs text-muted-foreground mt-1">Pattern & fatigue detection</div>
+              </Card>
+              <Card className="p-3">
+                <div className="text-sm font-medium text-accent">Rigidity Analysis</div>
+                <div className="text-xs text-muted-foreground mt-1">Muscle stiffness monitoring</div>
+              </Card>
+            </div>
+          </div>
         </div>
 
         {/* ECG Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle>ECG Signal</CardTitle>
-            <CardDescription>Heart rate variability monitoring</CardDescription>
-          </CardHeader>
-          <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="heartRate"
-                  stroke="hsl(var(--medical-danger))"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>ECG Signal</CardTitle>
+              <CardDescription>Heart rate variability monitoring</CardDescription>
+            </CardHeader>
+            <CardContent className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="time" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="heartRate"
+                    stroke="hsl(var(--medical-danger))"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+          
+          {/* ECG Features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Card className="p-3">
+              <div className="text-sm font-medium text-medical-danger">Autonomic Dysfunction</div>
+              <div className="text-xs text-muted-foreground mt-1">Nervous system monitoring</div>
+            </Card>
+            <Card className="p-3">
+              <div className="text-sm font-medium text-medical-danger">Cardiovascular Health</div>
+              <div className="text-xs text-muted-foreground mt-1">Heart rate variability analysis</div>
+            </Card>
+            <Card className="p-3">
+              <div className="text-sm font-medium text-medical-danger">Stress Markers</div>
+              <div className="text-xs text-muted-foreground mt-1">Physiological stress detection</div>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
