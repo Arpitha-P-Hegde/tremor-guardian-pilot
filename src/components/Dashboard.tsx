@@ -273,7 +273,7 @@ const Dashboard = () => {
                     <Line
                       type="monotone"
                       dataKey="gyroscope"
-                      stroke="hsl(var(--accent))"
+                      stroke="hsl(var(--medical-danger))"
                       strokeWidth={2}
                       dot={false}
                       name="Gyroscope"
