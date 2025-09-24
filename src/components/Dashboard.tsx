@@ -273,7 +273,7 @@ const Dashboard = () => {
                     <Line
                       type="monotone"
                       dataKey="gyroscope"
-                      stroke="hsl(var(--secondary))"
+                      stroke="hsl(var(--accent))"
                       strokeWidth={2}
                       dot={false}
                       name="Gyroscope"
