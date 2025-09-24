@@ -140,7 +140,8 @@ const Dashboard = () => {
 
   const chartData = sensorData.slice(-30).map((data, index) => ({
     time: index,
-    tremor: Math.sqrt(data.accelerometer.x ** 2 + data.accelerometer.y ** 2),
+    accelerometer: Math.sqrt(data.accelerometer.x ** 2 + data.accelerometer.y ** 2),
+    gyroscope: Math.sqrt(data.gyroscope.x ** 2 + data.gyroscope.y ** 2),
     emg: data.emg,
     heartRate: data.ecg
   }));
@@ -251,8 +252,8 @@ const Dashboard = () => {
           <div className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Tremor Amplitude</CardTitle>
-                <CardDescription>Real-time hand tremor measurement</CardDescription>
+                <CardTitle>Accelerometer + Gyroscope</CardTitle>
+                <CardDescription>Motion sensor data analysis</CardDescription>
               </CardHeader>
               <CardContent className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -263,25 +264,42 @@ const Dashboard = () => {
                     <Tooltip />
                     <Line
                       type="monotone"
-                      dataKey="tremor"
+                      dataKey="accelerometer"
                       stroke="hsl(var(--primary))"
                       strokeWidth={2}
                       dot={false}
+                      name="Accelerometer"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="gyroscope"
+                      stroke="hsl(var(--secondary))"
+                      strokeWidth={2}
+                      dot={false}
+                      name="Gyroscope"
                     />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
             
-            {/* Tremor Features */}
+            {/* Motion Sensor Features */}
             <div className="grid grid-cols-2 gap-3">
               <Card className="p-3">
-                <div className="text-sm font-medium text-primary">Movement Gait</div>
-                <div className="text-xs text-muted-foreground mt-1">Stride analysis & balance</div>
+                <div className="text-sm font-medium text-primary">Tremor</div>
+                <div className="text-xs text-muted-foreground mt-1">Rhythmic involuntary movement</div>
               </Card>
               <Card className="p-3">
-                <div className="text-sm font-medium text-primary">Coordination</div>
-                <div className="text-xs text-muted-foreground mt-1">Fine motor control assessment</div>
+                <div className="text-sm font-medium text-primary">Bradykinesia</div>
+                <div className="text-xs text-muted-foreground mt-1">Slowness of movement</div>
+              </Card>
+              <Card className="p-3">
+                <div className="text-sm font-medium text-primary">Gait</div>
+                <div className="text-xs text-muted-foreground mt-1">Walking pattern analysis</div>
+              </Card>
+              <Card className="p-3">
+                <div className="text-sm font-medium text-primary">Postural Instability</div>
+                <div className="text-xs text-muted-foreground mt-1">Balance & coordination</div>
               </Card>
             </div>
           </div>
@@ -312,14 +330,14 @@ const Dashboard = () => {
             </Card>
             
             {/* EMG Features */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <Card className="p-3">
-                <div className="text-sm font-medium text-accent">Muscle Activation</div>
-                <div className="text-xs text-muted-foreground mt-1">Pattern & fatigue detection</div>
+                <div className="text-sm font-medium text-accent">Muscle Rigidity</div>
+                <div className="text-xs text-muted-foreground mt-1">Stiffness & resistance measurement</div>
               </Card>
               <Card className="p-3">
-                <div className="text-sm font-medium text-accent">Rigidity Analysis</div>
-                <div className="text-xs text-muted-foreground mt-1">Muscle stiffness monitoring</div>
+                <div className="text-sm font-medium text-accent">Dyskinesia</div>
+                <div className="text-xs text-muted-foreground mt-1">Involuntary muscle movements</div>
               </Card>
             </div>
           </div>
@@ -355,15 +373,15 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <Card className="p-3">
               <div className="text-sm font-medium text-medical-danger">Autonomic Dysfunction</div>
-              <div className="text-xs text-muted-foreground mt-1">Nervous system monitoring</div>
+              <div className="text-xs text-muted-foreground mt-1">Nervous system irregularities</div>
             </Card>
             <Card className="p-3">
-              <div className="text-sm font-medium text-medical-danger">Cardiovascular Health</div>
-              <div className="text-xs text-muted-foreground mt-1">Heart rate variability analysis</div>
+              <div className="text-sm font-medium text-medical-danger">Fatigue</div>
+              <div className="text-xs text-muted-foreground mt-1">Energy level assessment</div>
             </Card>
             <Card className="p-3">
-              <div className="text-sm font-medium text-medical-danger">Stress Markers</div>
-              <div className="text-xs text-muted-foreground mt-1">Physiological stress detection</div>
+              <div className="text-sm font-medium text-medical-danger">Sleep Disturbances</div>
+              <div className="text-xs text-muted-foreground mt-1">Rest quality monitoring</div>
             </Card>
           </div>
         </div>
