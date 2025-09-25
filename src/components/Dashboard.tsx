@@ -55,11 +55,11 @@ const Dashboard = () => {
       acc + Math.sqrt(d.gyroscope.x ** 2 + d.gyroscope.y ** 2 + d.gyroscope.z ** 2), 0
     ) / recent.length;
     
-    // Simulate ML model confidence predictions (0-100%)
+    // Simulate ML model confidence predictions (0-100%) - reduced confidence for some features
     const tremor = Math.min(95, Math.max(5, (avgAcceleration * 25) + (Math.random() * 10)));
-    const bradykinesia = Math.min(95, Math.max(5, (avgGyro * 15) + (Math.random() * 15)));
-    const gait = Math.min(95, Math.max(5, (avgAcceleration * 20) + (avgGyro * 10) + (Math.random() * 12)));
-    const posturalInstability = Math.min(95, Math.max(5, (avgGyro * 18) + (avgAcceleration * 12) + (Math.random() * 8)));
+    const bradykinesia = Math.min(65, Math.max(5, (avgGyro * 8) + (Math.random() * 12))); // Reduced confidence
+    const gait = Math.min(70, Math.max(5, (avgAcceleration * 12) + (avgGyro * 6) + (Math.random() * 10))); // Reduced confidence
+    const posturalInstability = Math.min(75, Math.max(5, (avgGyro * 10) + (avgAcceleration * 8) + (Math.random() * 8))); // Reduced confidence
     
     return {
       tremor: Math.round(tremor),
@@ -82,8 +82,8 @@ const Dashboard = () => {
       muscleRigidity: avgEmg > 35 ? "Detected" : "Normal",
       dyskinesia: Math.random() > 0.7 ? "Detected" : "Not Detected", 
       autonomicDysfunction: avgAccel > 2 ? "Abnormal" : "Normal",
-      fatigue: Math.random() > 0.6 ? "Detected" : "Normal",
-      sleepDisturbances: Math.random() > 0.8 ? "Detected" : "Normal"
+      fatigue: "Normal", // Static - no fluctuation
+      sleepDisturbances: "Normal" // Static - no fluctuation
     };
   };
 
@@ -94,6 +94,38 @@ const Dashboard = () => {
     
     // Simulate tremor in accelerometer data
     const tremor = Math.sin(timestamp * tremorFreq * 0.1) * tremorAmplitude;
+    
+    // Generate realistic ECG pattern similar to reference image
+    const heartRate = 75; // BPM
+    const beatInterval = 60000 / heartRate; // ms per beat
+    const beatPhase = (timestamp % beatInterval) / beatInterval; // 0-1 cycle
+    
+    let ecgValue = 75; // Baseline
+    
+    // P wave (0.0-0.15 of cycle)
+    if (beatPhase < 0.15) {
+      const pPhase = beatPhase / 0.15;
+      ecgValue += 2 * Math.sin(pPhase * Math.PI);
+    }
+    // QRS complex (0.15-0.35 of cycle) - sharp spike like reference
+    else if (beatPhase < 0.35) {
+      const qrsPhase = (beatPhase - 0.15) / 0.2;
+      if (qrsPhase < 0.3) {
+        ecgValue -= 3; // Q wave
+      } else if (qrsPhase < 0.7) {
+        ecgValue += 15 * Math.sin((qrsPhase - 0.3) / 0.4 * Math.PI); // R wave - tall spike
+      } else {
+        ecgValue -= 8 * Math.sin((qrsPhase - 0.7) / 0.3 * Math.PI); // S wave
+      }
+    }
+    // T wave (0.5-0.8 of cycle)
+    else if (beatPhase > 0.5 && beatPhase < 0.8) {
+      const tPhase = (beatPhase - 0.5) / 0.3;
+      ecgValue += 4 * Math.sin(tPhase * Math.PI);
+    }
+    
+    // Add slight noise
+    ecgValue += (Math.random() - 0.5) * 1;
     
     return {
       timestamp,
@@ -108,7 +140,7 @@ const Dashboard = () => {
         z: tremor * 8 + (Math.random() - 0.5) * 4
       },
       emg: 20 + Math.abs(tremor) * 30 + Math.random() * 10, // Muscle activity
-      ecg: 75 + Math.sin(timestamp * 0.02) * 5 + Math.random() * 2 // Heart rate variation
+      ecg: ecgValue
     };
   };
 
