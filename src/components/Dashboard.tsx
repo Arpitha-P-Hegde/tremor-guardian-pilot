@@ -34,6 +34,13 @@ const Dashboard = () => {
     gait: 0,
     posturalInstability: 0
   });
+  const [medicalStatus, setMedicalStatus] = useState({
+    muscleRigidity: "Normal",
+    dyskinesia: "Not Detected",
+    autonomicDysfunction: "Normal", 
+    fatigue: "Normal",
+    sleepDisturbances: "Normal"
+  });
 
   // Simulate ML model predictions for Parkinson's features
   const simulateMLPredictions = (data: SensorData[]): typeof mlPredictions => {
@@ -61,6 +68,25 @@ const Dashboard = () => {
       posturalInstability: Math.round(posturalInstability)
     };
   };
+  // Simulate medical status indicators
+  const simulateMedicalStatus = (data: SensorData[]) => {
+    if (data.length < 5) return medicalStatus;
+    
+    const recent = data.slice(-10);
+    const avgEmg = recent.reduce((acc, d) => acc + d.emg, 0) / recent.length;
+    const avgAccel = recent.reduce((acc, d) => 
+      acc + Math.sqrt(d.accelerometer.x ** 2 + d.accelerometer.y ** 2 + d.accelerometer.z ** 2), 0
+    ) / recent.length;
+    
+    return {
+      muscleRigidity: avgEmg > 35 ? "Detected" : "Normal",
+      dyskinesia: Math.random() > 0.7 ? "Detected" : "Not Detected", 
+      autonomicDysfunction: avgAccel > 2 ? "Abnormal" : "Normal",
+      fatigue: Math.random() > 0.6 ? "Detected" : "Normal",
+      sleepDisturbances: Math.random() > 0.8 ? "Detected" : "Normal"
+    };
+  };
+
   const generateSensorData = (timestamp: number): SensorData => {
     // Base tremor frequency for Parkinson's (4-6 Hz)
     const tremorFreq = 4.5 + Math.random() * 1.5;
@@ -151,8 +177,10 @@ const Dashboard = () => {
         const updated = [...prev, newData].slice(-50); // Keep last 50 points
         const analysis = analyzeTremor(updated);
         const predictions = simulateMLPredictions(updated);
+        const status = simulateMedicalStatus(updated);
         setTremorAnalysis(analysis);
         setMlPredictions(predictions);
+        setMedicalStatus(status);
         setCurrentRecommendation(getRecommendation(analysis));
         return updated;
       });
@@ -275,7 +303,7 @@ const Dashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-accent-foreground">{currentRecommendation}</p>
+              <p className="text-foreground">{currentRecommendation}</p>
             </CardContent>
           </Card>
         )}
@@ -393,12 +421,26 @@ const Dashboard = () => {
             {/* EMG Features */}
             <div className="grid grid-cols-1 gap-3">
               <Card className="p-3">
-                <div className="text-sm font-medium text-accent">Muscle Rigidity</div>
-                <div className="text-xs text-muted-foreground mt-1">Stiffness & resistance measurement</div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-accent">Muscle Rigidity</div>
+                    <div className="text-xs text-muted-foreground mt-1">Stiffness & resistance measurement</div>
+                  </div>
+                  <Badge variant="outline" className={`text-xs ${medicalStatus.muscleRigidity === 'Detected' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-green-100 text-green-700 border-green-200'}`}>
+                    {medicalStatus.muscleRigidity}
+                  </Badge>
+                </div>
               </Card>
               <Card className="p-3">
-                <div className="text-sm font-medium text-accent">Dyskinesia</div>
-                <div className="text-xs text-muted-foreground mt-1">Involuntary muscle movements</div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-accent">Dyskinesia</div>
+                    <div className="text-xs text-muted-foreground mt-1">Involuntary muscle movements</div>
+                  </div>
+                  <Badge variant="outline" className={`text-xs ${medicalStatus.dyskinesia === 'Detected' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-green-100 text-green-700 border-green-200'}`}>
+                    {medicalStatus.dyskinesia}
+                  </Badge>
+                </div>
               </Card>
             </div>
           </div>
@@ -433,16 +475,37 @@ const Dashboard = () => {
           {/* ECG Features */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <Card className="p-3">
-              <div className="text-sm font-medium text-medical-danger">Autonomic Dysfunction</div>
-              <div className="text-xs text-muted-foreground mt-1">Nervous system irregularities</div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-medium text-medical-danger">Autonomic Dysfunction</div>
+                  <div className="text-xs text-muted-foreground mt-1">Nervous system irregularities</div>
+                </div>
+                <Badge variant="outline" className={`text-xs ${medicalStatus.autonomicDysfunction === 'Abnormal' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-green-100 text-green-700 border-green-200'}`}>
+                  {medicalStatus.autonomicDysfunction}
+                </Badge>
+              </div>
             </Card>
             <Card className="p-3">
-              <div className="text-sm font-medium text-medical-danger">Fatigue</div>
-              <div className="text-xs text-muted-foreground mt-1">Energy level assessment</div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-medium text-medical-danger">Fatigue</div>
+                  <div className="text-xs text-muted-foreground mt-1">Energy level assessment</div>
+                </div>
+                <Badge variant="outline" className={`text-xs ${medicalStatus.fatigue === 'Detected' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-green-100 text-green-700 border-green-200'}`}>
+                  {medicalStatus.fatigue}
+                </Badge>
+              </div>
             </Card>
             <Card className="p-3">
-              <div className="text-sm font-medium text-medical-danger">Sleep Disturbances</div>
-              <div className="text-xs text-muted-foreground mt-1">Rest quality monitoring</div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-medium text-medical-danger">Sleep Disturbances</div>
+                  <div className="text-xs text-muted-foreground mt-1">Rest quality monitoring</div>
+                </div>
+                <Badge variant="outline" className={`text-xs ${medicalStatus.sleepDisturbances === 'Detected' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-green-100 text-green-700 border-green-200'}`}>
+                  {medicalStatus.sleepDisturbances}
+                </Badge>
+              </div>
             </Card>
           </div>
         </div>
