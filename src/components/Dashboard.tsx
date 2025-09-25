@@ -87,6 +87,11 @@ const Dashboard = () => {
     };
   };
 
+  // Gaussian function for ECG wave components
+  const gaussian = (x: number, amplitude: number, center: number, width: number): number => {
+    return amplitude * Math.exp(-Math.pow(x - center, 2) / (2 * Math.pow(width, 2)));
+  };
+
   const generateSensorData = (timestamp: number): SensorData => {
     // Base tremor frequency for Parkinson's (4-6 Hz)
     const tremorFreq = 4.5 + Math.random() * 1.5;
@@ -95,37 +100,30 @@ const Dashboard = () => {
     // Simulate tremor in accelerometer data
     const tremor = Math.sin(timestamp * tremorFreq * 0.1) * tremorAmplitude;
     
-    // Generate realistic ECG pattern similar to reference image
+    // Generate realistic ECG using Gaussian functions for P-QRS-T waves
     const heartRate = 75; // BPM
-    const beatInterval = 60000 / heartRate; // ms per beat
+    const beatInterval = 800; // ms per beat (800ms = 75 BPM)
     const beatPhase = (timestamp % beatInterval) / beatInterval; // 0-1 cycle
+    const t = beatPhase; // Normalized time in beat cycle
     
     let ecgValue = 75; // Baseline
     
-    // P wave (0.0-0.15 of cycle)
-    if (beatPhase < 0.15) {
-      const pPhase = beatPhase / 0.15;
-      ecgValue += 2 * Math.sin(pPhase * Math.PI);
-    }
-    // QRS complex (0.15-0.35 of cycle) - sharp spike like reference
-    else if (beatPhase < 0.35) {
-      const qrsPhase = (beatPhase - 0.15) / 0.2;
-      if (qrsPhase < 0.3) {
-        ecgValue -= 3; // Q wave
-      } else if (qrsPhase < 0.7) {
-        ecgValue += 15 * Math.sin((qrsPhase - 0.3) / 0.4 * Math.PI); // R wave - tall spike
-      } else {
-        ecgValue -= 8 * Math.sin((qrsPhase - 0.7) / 0.3 * Math.PI); // S wave
-      }
-    }
-    // T wave (0.5-0.8 of cycle)
-    else if (beatPhase > 0.5 && beatPhase < 0.8) {
-      const tPhase = (beatPhase - 0.5) / 0.3;
-      ecgValue += 4 * Math.sin(tPhase * Math.PI);
-    }
+    // P wave: Small bump at 0.15 of cycle
+    ecgValue += gaussian(t, 3, 0.15, 0.04);
     
-    // Add slight noise
-    ecgValue += (Math.random() - 0.5) * 1;
+    // QRS Complex: Sharp spikes
+    // Q wave: Small negative deflection
+    ecgValue += gaussian(t, -2, 0.35, 0.01);
+    // R wave: Large positive spike (main peak)
+    ecgValue += gaussian(t, 20, 0.37, 0.015);
+    // S wave: Negative deflection after R
+    ecgValue += gaussian(t, -5, 0.39, 0.012);
+    
+    // T wave: Wider positive bump after QRS
+    ecgValue += gaussian(t, 5, 0.6, 0.08);
+    
+    // Add physiological noise
+    ecgValue += (Math.random() - 0.5) * 0.5;
     
     return {
       timestamp,
