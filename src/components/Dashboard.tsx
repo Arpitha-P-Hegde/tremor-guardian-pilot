@@ -28,8 +28,39 @@ const Dashboard = () => {
     confidence: 0
   });
   const [currentRecommendation, setCurrentRecommendation] = useState("");
+  const [mlPredictions, setMlPredictions] = useState({
+    tremor: 0,
+    bradykinesia: 0,
+    gait: 0,
+    posturalInstability: 0
+  });
 
-  // Simulate realistic Parkinson's sensor data
+  // Simulate ML model predictions for Parkinson's features
+  const simulateMLPredictions = (data: SensorData[]): typeof mlPredictions => {
+    if (data.length < 5) return { tremor: 0, bradykinesia: 0, gait: 0, posturalInstability: 0 };
+    
+    const recent = data.slice(-10);
+    const avgAcceleration = recent.reduce((acc, d) => 
+      acc + Math.sqrt(d.accelerometer.x ** 2 + d.accelerometer.y ** 2 + d.accelerometer.z ** 2), 0
+    ) / recent.length;
+    
+    const avgGyro = recent.reduce((acc, d) => 
+      acc + Math.sqrt(d.gyroscope.x ** 2 + d.gyroscope.y ** 2 + d.gyroscope.z ** 2), 0
+    ) / recent.length;
+    
+    // Simulate ML model confidence predictions (0-100%)
+    const tremor = Math.min(95, Math.max(5, (avgAcceleration * 25) + (Math.random() * 10)));
+    const bradykinesia = Math.min(95, Math.max(5, (avgGyro * 15) + (Math.random() * 15)));
+    const gait = Math.min(95, Math.max(5, (avgAcceleration * 20) + (avgGyro * 10) + (Math.random() * 12)));
+    const posturalInstability = Math.min(95, Math.max(5, (avgGyro * 18) + (avgAcceleration * 12) + (Math.random() * 8)));
+    
+    return {
+      tremor: Math.round(tremor),
+      bradykinesia: Math.round(bradykinesia),
+      gait: Math.round(gait),
+      posturalInstability: Math.round(posturalInstability)
+    };
+  };
   const generateSensorData = (timestamp: number): SensorData => {
     // Base tremor frequency for Parkinson's (4-6 Hz)
     const tremorFreq = 4.5 + Math.random() * 1.5;
@@ -119,7 +150,9 @@ const Dashboard = () => {
       setSensorData(prev => {
         const updated = [...prev, newData].slice(-50); // Keep last 50 points
         const analysis = analyzeTremor(updated);
+        const predictions = simulateMLPredictions(updated);
         setTremorAnalysis(analysis);
+        setMlPredictions(predictions);
         setCurrentRecommendation(getRecommendation(analysis));
         return updated;
       });
@@ -286,20 +319,48 @@ const Dashboard = () => {
             {/* Motion Sensor Features */}
             <div className="grid grid-cols-2 gap-3">
               <Card className="p-3">
-                <div className="text-sm font-medium text-primary">Tremor</div>
-                <div className="text-xs text-muted-foreground mt-1">Rhythmic involuntary movement</div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-primary">Tremor</div>
+                    <div className="text-xs text-muted-foreground mt-1">Rhythmic involuntary movement</div>
+                  </div>
+                  <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
+                    {mlPredictions.tremor}%
+                  </Badge>
+                </div>
               </Card>
               <Card className="p-3">
-                <div className="text-sm font-medium text-primary">Bradykinesia</div>
-                <div className="text-xs text-muted-foreground mt-1">Slowness of movement</div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-primary">Bradykinesia</div>
+                    <div className="text-xs text-muted-foreground mt-1">Slowness of movement</div>
+                  </div>
+                  <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
+                    {mlPredictions.bradykinesia}%
+                  </Badge>
+                </div>
               </Card>
               <Card className="p-3">
-                <div className="text-sm font-medium text-primary">Gait</div>
-                <div className="text-xs text-muted-foreground mt-1">Walking pattern analysis</div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-primary">Gait</div>
+                    <div className="text-xs text-muted-foreground mt-1">Walking pattern analysis</div>
+                  </div>
+                  <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
+                    {mlPredictions.gait}%
+                  </Badge>
+                </div>
               </Card>
               <Card className="p-3">
-                <div className="text-sm font-medium text-primary">Postural Instability</div>
-                <div className="text-xs text-muted-foreground mt-1">Balance & coordination</div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-primary">Postural Instability</div>
+                    <div className="text-xs text-muted-foreground mt-1">Balance & coordination</div>
+                  </div>
+                  <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
+                    {mlPredictions.posturalInstability}%
+                  </Badge>
+                </div>
               </Card>
             </div>
           </div>
