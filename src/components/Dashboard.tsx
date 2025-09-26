@@ -100,43 +100,49 @@ const Dashboard = () => {
     // Simulate tremor in accelerometer data
     const tremor = Math.sin(timestamp * tremorFreq * 0.1) * tremorAmplitude;
     
-    // Generate sharp, continuous ECG pulses like in medical monitors
-    const heartRate = 75; // BPM
-    const beatInterval = 800; // ms per beat
+    // Generate ECG pattern exactly like smartwatch display
+    const heartRate = 68; // BPM as shown in image
+    const beatInterval = 882; // ms per beat (60000/68)
     const beatPhase = (timestamp % beatInterval) / beatInterval; // 0-1 cycle
     const t = beatPhase;
     
-    let ecgValue = 75; // Baseline
+    let ecgValue = 50; // Baseline around middle of range
     
-    // Create sharp QRS complexes that are clearly visible
-    if (t >= 0.2 && t <= 0.4) {
-      const qrsPhase = (t - 0.2) / 0.2; // Normalize QRS phase to 0-1
+    // P wave - small rounded wave before QRS (10-15% of cycle)
+    if (t >= 0.1 && t <= 0.2) {
+      const pPhase = (t - 0.1) / 0.1;
+      ecgValue += 8 * Math.sin(pPhase * Math.PI);
+    }
+    
+    // QRS Complex - sharp, tall spike (25-35% of cycle)
+    if (t >= 0.25 && t <= 0.35) {
+      const qrsPhase = (t - 0.25) / 0.1;
       
       if (qrsPhase < 0.2) {
-        // Q wave - small negative spike
-        ecgValue += -8 * Math.exp(-Math.pow((qrsPhase - 0.1) * 30, 2));
-      } else if (qrsPhase >= 0.3 && qrsPhase < 0.7) {
-        // R wave - large sharp positive spike
-        const rPhase = (qrsPhase - 0.3) / 0.4;
-        ecgValue += 35 * Math.exp(-Math.pow((rPhase - 0.5) * 8, 2));
-      } else if (qrsPhase >= 0.7) {
-        // S wave - negative spike after R
-        ecgValue += -12 * Math.exp(-Math.pow((qrsPhase - 0.85) * 20, 2));
+        // Q wave - small negative dip
+        ecgValue += -5;
+      } else if (qrsPhase >= 0.2 && qrsPhase < 0.8) {
+        // R wave - very sharp tall positive spike
+        const rPhase = (qrsPhase - 0.2) / 0.6;
+        if (rPhase < 0.5) {
+          ecgValue += 45 * (rPhase * 2); // Sharp rise
+        } else {
+          ecgValue += 45 * (2 - rPhase * 2); // Sharp fall
+        }
+      } else {
+        // S wave - negative dip after R
+        ecgValue += -8;
       }
     }
     
-    // Small P wave before QRS
-    if (t >= 0.05 && t <= 0.15) {
-      ecgValue += 3 * Math.exp(-Math.pow((t - 0.1) * 15, 2));
+    // T wave - moderate rounded wave after QRS (55-75% of cycle)
+    if (t >= 0.55 && t <= 0.75) {
+      const tPhase = (t - 0.55) / 0.2;
+      ecgValue += 15 * Math.sin(tPhase * Math.PI);
     }
     
-    // T wave after QRS
-    if (t >= 0.5 && t <= 0.8) {
-      ecgValue += 6 * Math.exp(-Math.pow((t - 0.65) * 8, 2));
-    }
-    
-    // Add minimal noise to keep the sharp edges clear
-    ecgValue += (Math.random() - 0.5) * 0.8;
+    // Add very minimal noise to keep sharp definition
+    ecgValue += (Math.random() - 0.5) * 0.5;
     
     return {
       timestamp,
