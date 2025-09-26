@@ -100,58 +100,43 @@ const Dashboard = () => {
     // Simulate tremor in accelerometer data
     const tremor = Math.sin(timestamp * tremorFreq * 0.1) * tremorAmplitude;
     
-    // Generate medically accurate ECG with proper intervals and morphology
-    const heartRate = 72 + Math.sin(timestamp * 0.001) * 3; // Slight heart rate variability
-    const beatInterval = 60000 / heartRate; // ms per beat
+    // Generate sharp, continuous ECG pulses like in medical monitors
+    const heartRate = 75; // BPM
+    const beatInterval = 800; // ms per beat
     const beatPhase = (timestamp % beatInterval) / beatInterval; // 0-1 cycle
     const t = beatPhase;
     
-    let ecgValue = 0; // Baseline at 0
+    let ecgValue = 75; // Baseline
     
-    // Medical ECG intervals (in cycle fraction):
-    // PR interval: ~0.12-0.20s (16-25% of cycle)
-    // QRS duration: ~0.06-0.10s (8-13% of cycle) 
-    // QT interval: ~0.36-0.44s (45-55% of cycle)
-    
-    // P Wave (Atrial Depolarization): 0.08-0.18 of cycle
-    // Small, smooth, upward deflection
-    if (t >= 0.08 && t <= 0.18) {
-      const pCenter = 0.13;
-      ecgValue += gaussian(t, 2, pCenter, 0.025); // Small amplitude, smooth
-    }
-    
-    // PR Segment: Flat baseline (0.18-0.25)
-    
-    // QRS Complex (Ventricular Depolarization): 0.25-0.35 of cycle
-    if (t >= 0.25 && t <= 0.35) {
-      // Q wave: Small negative deflection (0.25-0.27)
-      ecgValue += gaussian(t, -1.5, 0.26, 0.008);
+    // Create sharp QRS complexes that are clearly visible
+    if (t >= 0.2 && t <= 0.4) {
+      const qrsPhase = (t - 0.2) / 0.2; // Normalize QRS phase to 0-1
       
-      // R wave: Large positive spike (0.27-0.32) - main peak
-      ecgValue += gaussian(t, 25, 0.295, 0.012);
-      
-      // S wave: Negative deflection (0.32-0.35)
-      ecgValue += gaussian(t, -8, 0.33, 0.008);
+      if (qrsPhase < 0.2) {
+        // Q wave - small negative spike
+        ecgValue += -8 * Math.exp(-Math.pow((qrsPhase - 0.1) * 30, 2));
+      } else if (qrsPhase >= 0.3 && qrsPhase < 0.7) {
+        // R wave - large sharp positive spike
+        const rPhase = (qrsPhase - 0.3) / 0.4;
+        ecgValue += 35 * Math.exp(-Math.pow((rPhase - 0.5) * 8, 2));
+      } else if (qrsPhase >= 0.7) {
+        // S wave - negative spike after R
+        ecgValue += -12 * Math.exp(-Math.pow((qrsPhase - 0.85) * 20, 2));
+      }
     }
     
-    // ST Segment: Slight elevation or depression (0.35-0.45)
-    if (t >= 0.35 && t <= 0.45) {
-      ecgValue += Math.sin((t - 0.35) * Math.PI * 10) * 0.3; // Slight ST variation
+    // Small P wave before QRS
+    if (t >= 0.05 && t <= 0.15) {
+      ecgValue += 3 * Math.exp(-Math.pow((t - 0.1) * 15, 2));
     }
     
-    // T Wave (Ventricular Repolarization): 0.45-0.70 of cycle
-    // Smooth, asymmetric, upward deflection
-    if (t >= 0.45 && t <= 0.70) {
-      const tCenter = 0.57;
-      ecgValue += gaussian(t, 4, tCenter, 0.055); // Wider, smoother than P wave
+    // T wave after QRS
+    if (t >= 0.5 && t <= 0.8) {
+      ecgValue += 6 * Math.exp(-Math.pow((t - 0.65) * 8, 2));
     }
     
-    // Add realistic physiological variations
-    ecgValue += Math.sin(timestamp * 0.01) * 0.2; // Respiratory variation
-    ecgValue += (Math.random() - 0.5) * 0.3; // Electronic noise
-    
-    // Convert to typical ECG display range (around 70-80 with variations)
-    ecgValue = 75 + (ecgValue * 1.2);
+    // Add minimal noise to keep the sharp edges clear
+    ecgValue += (Math.random() - 0.5) * 0.8;
     
     return {
       timestamp,
